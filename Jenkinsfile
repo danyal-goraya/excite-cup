@@ -30,8 +30,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                docker compose down || true
-                docker compose up -d
+                docker compose -p excitecup down || true
+                docker compose -p excitecup up -d
                 docker ps
                 '''
             }
