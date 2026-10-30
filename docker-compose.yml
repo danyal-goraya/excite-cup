@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: eventuser
+      POSTGRES_PASSWORD: eventpass
+      POSTGRES_DB: eventdb
+    restart: always
+  backend:
+    image: ${DOCKERHUB_USER:-local}/excitecup-backend:latest
+    build: ./backend
+    depends_on: [db]
+    restart: always
+  frontend:
+    image: ${DOCKERHUB_USER:-local}/excitecup-frontend:latest
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on: [backend]
+    restart: always

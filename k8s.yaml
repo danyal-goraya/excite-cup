@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: db}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: db}}
+  template:
+    metadata: {labels: {app: db}}
+    spec:
+      containers:
+      - name: db
+        image: postgres:16-alpine
+        env:
+        - {name: POSTGRES_USER, value: eventuser}
+        - {name: POSTGRES_PASSWORD, value: eventpass}
+        - {name: POSTGRES_DB, value: eventdb}
+        ports: [{containerPort: 5432}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: db}
+spec:
+  selector: {app: db}
+  ports: [{port: 5432, targetPort: 5432}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: backend}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: backend}}
+  template:
+    metadata: {labels: {app: backend}}
+    spec:
+      containers:
+      - name: backend
+        image: danyal722/excitecup-backend:latest
+        ports: [{containerPort: 3000}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: backend}
+spec:
+  selector: {app: backend}
+  ports: [{port: 3000, targetPort: 3000}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: frontend}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: frontend}}
+  template:
+    metadata: {labels: {app: frontend}}
+    spec:
+      containers:
+      - name: frontend
+        image: danyal722/excitecup-frontend:latest
+        ports: [{containerPort: 80}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: frontend}
+spec:
+  type: NodePort
+  selector: {app: frontend}
+  ports: [{port: 80, targetPort: 80}]
